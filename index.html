@@ -2,17 +2,24 @@
 <html lang="mn">
 <head>
     <meta charset="UTF-8">
-    <title>Hikvision WebRTC Stream</title>
+    <title>Hikvision WebRTC Live Stream</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #111; color: #fff; text-align: center; }
+        h2 { color: #fff; }
+        .video-container { margin-top: 20px; display: inline-block; background: #000; padding: 10px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        iframe { width: 800px; height: 450px; border: none; background: #000; border-radius: 4px; display: block; }
+    </style>
 </head>
-<body style="background: #111; color: #fff; font-family: Arial, sans-serif; text-align: center; margin-top: 50px;">
+<body>
 
-    <h2>Hikvision IP Camera (Live Stream)</h2>
+    <h2>Hikvision IP Camera P2P Live Stream</h2>
 
-    <!-- Go2rtc-ийн өгч буй шууд iframe холболт (Серверийнхээ IP болон портыг зөв бичсэн эсэхээ шалгаарай) -->
-    <iframe src="http://192.168.88.204:1984/stream.html?src=cam1&mode=webrtc" 
-            style="width: 800px; height: 450px; border: none; background: #000; border-radius: 8px;" 
-            allowfullscreen>
-    </iframe>
+    <div class="video-container">
+        <!-- go2rtc болон ngrok-оор дамжиж ирж буй WebRTC урсгал -->
+        <iframe src="https://dwelled-mangle-lethargic.ngrok-free.dev/stream.html?src=cam1&mode=webrtc" 
+                allowfullscreen>
+        </iframe>
+    </div>
 
 </body>
 </html>
