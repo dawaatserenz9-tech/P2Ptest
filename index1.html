@@ -4,35 +4,15 @@
     <meta charset="UTF-8">
     <title>Hikvision WebRTC Stream</title>
 </head>
-<body>
+<body style="background: #111; color: #fff; font-family: Arial, sans-serif; text-align: center; margin-top: 50px;">
 
-    <h2>Hikvision IP Camera (WebRTC Stream)</h2>
+    <h2>Hikvision IP Camera (Live Stream)</h2>
 
-    <!-- go2rtc-ийн өгч буй WebRTC стримийг шууд тоглуулах video элемент -->
-    <video id="camVideo" autoplay playsinline controls muted style="width: 640px; background: #000;"></video>
-
-    <!-- go2rtc-ийн албан ёсны WebRTC скриптийг ашиглах -->
-    <script type="module">
-        import { WebRTCStreamer } from "https://unpkg.com/@alexxit/go2rtc@v1.8.5/www/webrtc-stream.js";
-        
-        // go2rtc сервер ажиллаж буй хаяг болон stream нэрээ холбох
-        const videoElem = document.getElementById('camVideo');
-        // Хэрэв сервер өөр компьютер дээр байвал localhost-ын оронд серверийн IP-г бичнэ
-        videoElem.srcObject = new MediaStream();
-        
-        // go2rtc-ийн WebSocket/WebRTC холболт үүсгэх
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const go2rtcUrl = `${wsProtocol}//${window.location.hostname}:1984/api/ws?src=cam1`;
-        
-        // Stream холболт
-        import("https://unpkg.com/@alexxit/go2rtc@v1.8.5/www/webrtc-card.lib.js").then(() => {
-            // go2rtc client ашиглан холбох
-            const stream = window.WebRTCStreamer ? new window.WebRTCStreamer(videoElem, go2rtcUrl) : null;
-        });
-    </script>
-
-    <!-- Эсвэл хамгийн хялбараар iframe ашиглах бол: -->
-    <!-- <iframe src="http://SERVER_IP:1984/stream.html?src=cam1" style="width:640px; height:360px; border:none;" allowfullscreen></iframe> -->
+    <!-- Go2rtc-ийн өгч буй шууд iframe холболт (Серверийнхээ IP болон портыг зөв бичсэн эсэхээ шалгаарай) -->
+    <iframe src="http://192.168.88.204:1984/stream.html?src=cam1&mode=webrtc" 
+            style="width: 800px; height: 450px; border: none; background: #000; border-radius: 8px;" 
+            allowfullscreen>
+    </iframe>
 
 </body>
 </html>
