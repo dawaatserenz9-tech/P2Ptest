@@ -2,24 +2,56 @@
 <html lang="mn">
 <head>
     <meta charset="UTF-8">
-    <title>Hikvision WebRTC Live Stream</title>
+    <title>Hikvision Live Stream (WebSocket + FFmpeg)</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #111; color: #fff; text-align: center; }
-        h2 { color: #fff; }
-        .video-container { margin-top: 20px; display: inline-block; background: #000; padding: 10px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        iframe { width: 800px; height: 450px; border: none; background: #000; border-radius: 4px; display: block; }
+        body { font-family: Arial, sans-serif; margin: 30px; background: #f4f4f9; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { color: #333; text-align: center; }
+        .video-box { text-align: center; margin-top: 20px; }
+        /* Canvas дээр камерын дүрс шууд бууна */
+        canvas { background: #000; border-radius: 6px; width: 640px; height: 360px; max-width: 100%; }
+        .status { margin-top: 10px; font-weight: bold; color: #555; text-align: center; }
     </style>
 </head>
 <body>
 
-    <h2>Hikvision IP Camera P2P Live Stream</h2>
-
-    <div class="video-container">
-        <!-- go2rtc болон ngrok-оор дамжиж ирж буй WebRTC урсгал -->
-        <iframe src="https://dwelled-mangle-lethargic.ngrok-free.dev/stream.html?src=cam1&mode=webrtc" 
-                allowfullscreen>
-        </iframe>
+    <div class="container">
+        <h2>Hikvision Live Stream</h2>
+        
+        <div class="video-box">
+            <!-- JSMpeg тоглуулах canvas элемент -->
+            <canvas id="video-canvas"></canvas>
+        </div>
+        
+        <div class="status" id="status">Сервертэй холбогдож байна...</div>
     </div>
+
+    <!-- JSMpeg номын санг CDN-ээс оруулах -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmpeg/0.2/jsmpeg.min.js"></script>
+    <script>
+        const statusDiv = document.getElementById('status');
+        const canvas = document.getElementById('video-canvas');
+
+        // WebSocket серверийн хаяг (Локал эсвэл сервер дээр ажиллаж байгаа IP хаягаа бичнэ)
+        const wsUrl = 'ws://localhost:8080';
+
+        try {
+            // JSMpeg ашиглан WebSocket урсгалыг Canvas руу холбож тоглуулах
+            const player = new JSMpeg.Player(wsUrl, {
+                canvas: canvas,
+                autoplay: true,
+                audio: false,
+                openia: true
+            });
+
+            statusDiv.innerText = "Холболт амжилттай, дүрс дамжиж байна...";
+            statusDiv.style.color = "green";
+        } catch (error) {
+            console.error("JSMpeg error:", error);
+            statusDiv.innerText = "Холболт амжилтгүй боллоо!";
+            statusDiv.style.color = "red";
+        }
+    </script>
 
 </body>
 </html>
