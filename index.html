@@ -2,56 +2,59 @@
 <html lang="mn">
 <head>
     <meta charset="UTF-8">
-    <title>Hikvision Live Stream (WebSocket + FFmpeg)</title>
+    <title>TandemVu Dual Camera Live</title>
+    <script src="https://open.ys7.com/sdk/js/2.0/ezuikit.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 30px; background: #f4f4f9; }
-        .container { max-width: 700px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h2 { color: #333; text-align: center; }
-        .video-box { text-align: center; margin-top: 20px; }
-        /* Canvas дээр камерын дүрс шууд бууна */
-        canvas { background: #000; border-radius: 6px; width: 640px; height: 360px; max-width: 100%; }
-        .status { margin-top: 10px; font-weight: bold; color: #555; text-align: center; }
+        body { background: #111; color: white; font-family: sans-serif; text-align: center; }
+        .stream-grid { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
+        .video-box { width: 640px; height: 360px; background: #000; border-radius: 8px; overflow: hidden; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Hikvision Live Stream</h2>
-        
-        <div class="video-box">
-            <!-- JSMpeg тоглуулах canvas элемент -->
-            <canvas id="video-canvas"></canvas>
+    <h2>TandemVu Live Stream (P2P Low-Latency)</h2>
+
+    <div class="stream-grid">
+        <!-- 1-р суваг: Panoramic өргөн дуран -->
+        <div>
+            <h3>1. Panoramic Дуран</h3>
+            <div id="video-panoramic" class="video-box"></div>
         </div>
-        
-        <div class="status" id="status">Сервертэй холбогдож байна...</div>
+
+        <!-- 2-р суваг: 25X PTZ эргэдэг дуран -->
+        <div>
+            <h3>2. PTZ 25X Дуран</h3>
+            <div id="video-ptz" class="video-box"></div>
+        </div>
     </div>
 
-    <!-- JSMpeg номын санг CDN-ээс оруулах -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmpeg/0.2/jsmpeg.min.js"></script>
     <script>
-        const statusDiv = document.getElementById('status');
-        const canvas = document.getElementById('video-canvas');
+        const SERIAL_NO = "GK4145227";           // Таны камерын сериал
+        const VERIFY_CODE = "ТАНЫ_НУУЦ_ҮГ";       // Таны тавьсан Verification Code
+        const ACCESS_TOKEN = "ТАНЫ_ACCESS_TOKEN"; // Hik-Connect Developer Token
 
-        // WebSocket серверийн хаяг (Локал эсвэл сервер дээр ажиллаж байгаа IP хаягаа бичнэ)
-        const wsUrl = 'ws://localhost:8080';
+        // 1-р суваг (Panoramic)
+        var player1 = new EZUIKit.EZUIPlayer({
+            id: 'video-panoramic',
+            autoplay: true,
+            url: `ezopen://${VERIFY_CODE}@open.hik-connect.com/${SERIAL_NO}/1.live`,
+            accessToken: ACCESS_TOKEN,
+            width: 640,
+            height: 360
+        });
 
-        try {
-            // JSMpeg ашиглан WebSocket урсгалыг Canvas руу холбож тоглуулах
-            const player = new JSMpeg.Player(wsUrl, {
-                canvas: canvas,
-                autoplay: true,
-                audio: false,
-                openia: true
-            });
+        // 2-р суваг (PTZ)
+        var player2 = new EZUIKit.EZUIPlayer({
+            id: 'video-ptz',
+            autoplay: true,
+            url: `ezopen://${VERIFY_CODE}@open.hik-connect.com/${SERIAL_NO}/2.live`,
+            accessToken: ACCESS_TOKEN,
+            width: 640,
+            height: 360
+        });
 
-            statusDiv.innerText = "Холболт амжилттай, дүрс дамжиж байна...";
-            statusDiv.style.color = "green";
-        } catch (error) {
-            console.error("JSMpeg error:", error);
-            statusDiv.innerText = "Холболт амжилтгүй боллоо!";
-            statusDiv.style.color = "red";
-        }
+        player1.play();
+        player2.play();
     </script>
-
 </body>
 </html>
