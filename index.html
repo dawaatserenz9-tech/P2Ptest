@@ -21,7 +21,6 @@
             gap: 24px; 
         }
         
-        /* PTZ удирдлагын хэсэг */
         .ptz-card {
             background: #1e293b;
             border: 1px solid #334155;
@@ -62,7 +61,6 @@
             font-size: 14px;
         }
 
-        /* Камеруудын сүлжээ */
         .grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); 
@@ -136,49 +134,45 @@
             </div>
         </div>
 
-        <!-- Дүрсийн хэсэг: Порт 8890 -->
+        <!-- 4 Камерын шууд дүрс (Cloudflare HTTPS Түннель) -->
         <div class="grid">
-            <!-- 1. Дан камер -->
             <div class="video-box">
                 <div class="video-header">
                     <span>Дан Камер (FG1183082)</span>
                     <span class="badge">LIVE</span>
                 </div>
-                <iframe src="http://202.131.225.19:8890/cam1"></iframe>
+                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam1"></iframe>
             </div>
 
-            <!-- 2. NVR Камер 1 -->
             <div class="video-box">
                 <div class="video-header">
                     <span>NVR - Камер 1 (GB5857342)</span>
                     <span class="badge">LIVE</span>
                 </div>
-                <iframe src="http://202.131.225.19:8890/cam2"></iframe>
+                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam2"></iframe>
             </div>
 
-            <!-- 3. NVR Камер 2 -->
             <div class="video-box">
                 <div class="video-header">
                     <span>NVR - Камер 2 (GB5857342)</span>
                     <span class="badge">LIVE</span>
                 </div>
-                <iframe src="http://202.131.225.19:8890/cam3"></iframe>
+                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam3"></iframe>
             </div>
 
-            <!-- 4. NVR Камер 3 -->
             <div class="video-box">
                 <div class="video-header">
                     <span>NVR - Камер 3 (GB5857342)</span>
                     <span class="badge">LIVE</span>
                 </div>
-                <iframe src="http://202.131.225.19:8890/cam4"></iframe>
+                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam4"></iframe>
             </div>
         </div>
     </div>
 
     <script>
-        // PTZ команд илгээх порт: 8891
-        const API_HOST = "http://202.131.225.19:8891";
+        // PTZ удирдлагын Cloudflare HTTPS түннель
+        const API_HOST = "https://knee-signs-gmc-simultaneously.trycloudflare.com";
 
         function sendPTZ(cmd) {
             const selectVal = document.getElementById("targetCam").value;
