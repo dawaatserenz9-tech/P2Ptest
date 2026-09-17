@@ -7,29 +7,36 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            background: #0f172a; 
+            background: #0b0f19; 
             color: #f8fafc; 
-            font-family: sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             padding: 20px; 
             text-align: center; 
         }
-        .container { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 24px; 
+        }
         
         /* PTZ Удирдлага */
         .ptz-card {
             background: #1e293b;
             border: 1px solid #334155;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 16px 24px;
+            border-radius: 12px;
             display: inline-block;
             margin: 0 auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         .controls-grid {
             display: grid;
             grid-template-columns: repeat(3, 75px);
             grid-gap: 8px;
             justify-content: center;
-            margin: 12px 0;
+            margin: 14px 0;
         }
         button {
             background: #38bdf8;
@@ -38,45 +45,52 @@
             padding: 10px;
             border-radius: 6px;
             font-weight: bold;
+            font-size: 13px;
             cursor: pointer;
+            transition: background 0.15s;
         }
         button:hover { background: #7dd3fc; }
         button:active { background: #0284c7; }
-        .zoom-group { display: flex; justify-content: center; gap: 10px; }
+        .zoom-group { display: flex; justify-content: center; gap: 12px; }
         select { 
             padding: 8px 12px; 
             border-radius: 6px; 
-            background: #0b0f19; 
+            background: #0f172a; 
             color: #fff; 
             border: 1px solid #475569; 
+            outline: none;
+            font-size: 14px;
         }
 
         /* Камеруудын дэлгэц */
         .grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); 
-            gap: 15px; 
+            gap: 16px; 
         }
         .video-box { 
             background: #1e293b; 
-            border-radius: 8px; 
+            border-radius: 10px; 
             overflow: hidden; 
             border: 1px solid #334155; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
         }
         .video-header {
             padding: 10px 14px;
             background: #111827;
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 13px;
+            font-weight: 600;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
         .badge {
             background: #16a34a;
             color: #fff;
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 12px;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            letter-spacing: 0.5px;
         }
         iframe { 
             width: 100%; 
@@ -92,7 +106,7 @@
     <div class="container">
         <h2>Хяналтын Камерууд (Шууд Дүрс & PTZ)</h2>
 
-        <!-- PTZ удирдлагын хэсэг -->
+        <!-- PTZ удирдлага -->
         <div class="ptz-card">
             <div>
                 <label>Удирдах камер: </label>
@@ -101,7 +115,6 @@
                     <option value="GB5857342:1">NVR - Камер 1</option>
                     <option value="GB5857342:2">NVR - Камер 2</option>
                     <option value="GB5857342:3">NVR - Камер 3</option>
-                    <option value="GB5857342:4">NVR - Камер 4</option>
                 </select>
             </div>
 
@@ -123,7 +136,7 @@
             </div>
         </div>
 
-        <!-- Дүрс харуулах хэсэг -->
+        <!-- 4 Камерын дэлгэц -->
         <div class="grid">
             <!-- 1. Дан камер -->
             <div class="video-box">
@@ -131,7 +144,7 @@
                     <span>Дан Камер (FG1183082)</span>
                     <span class="badge">LIVE</span>
                 </div>
-                <iframe src="http://202.131.225.19:8889/FG1183082_cam1"></iframe>
+                <iframe src="http://202.131.225.19:8889/cam1"></iframe>
             </div>
 
             <!-- 2. NVR Камер 1 -->
@@ -140,7 +153,7 @@
                     <span>NVR - Камер 1 (GB5857342)</span>
                     <span class="badge">LIVE</span>
                 </div>
-                <iframe src="http://202.131.225.19:8889/GB5857342_cam1"></iframe>
+                <iframe src="http://202.131.225.19:8889/cam2"></iframe>
             </div>
 
             <!-- 3. NVR Камер 2 -->
@@ -149,7 +162,7 @@
                     <span>NVR - Камер 2 (GB5857342)</span>
                     <span class="badge">LIVE</span>
                 </div>
-                <iframe src="http://202.131.225.19:8889/GB5857342_cam2"></iframe>
+                <iframe src="http://202.131.225.19:8889/cam3"></iframe>
             </div>
 
             <!-- 4. NVR Камер 3 -->
@@ -158,7 +171,7 @@
                     <span>NVR - Камер 3 (GB5857342)</span>
                     <span class="badge">LIVE</span>
                 </div>
-                <iframe src="http://202.131.225.19:8889/GB5857342_cam3"></iframe>
+                <iframe src="http://202.131.225.19:8889/cam4"></iframe>
             </div>
         </div>
     </div>
@@ -172,7 +185,8 @@
 
             fetch(`${API_HOST}/ptz?dev=${dev}&ch=${ch}&cmd=${cmd}`)
                 .then(r => r.json())
-                .catch(e => console.error("PTZ Алдаа:", e));
+                .then(data => console.log("PTZ command ok:", data))
+                .catch(e => console.error("PTZ алдаа:", e));
         }
     </script>
 </body>
