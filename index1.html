@@ -21,7 +21,7 @@
             gap: 24px; 
         }
         
-        /* PTZ Удирдлага */
+        /* PTZ удирдлагын хэсэг */
         .ptz-card {
             background: #1e293b;
             border: 1px solid #334155;
@@ -62,7 +62,7 @@
             font-size: 14px;
         }
 
-        /* Камеруудын дэлгэц */
+        /* Камеруудын сүлжээ */
         .grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); 
@@ -136,7 +136,7 @@
             </div>
         </div>
 
-        <!-- 4 Камерын дэлгэц -->
+        <!-- Дүрсийн хэсэг: Порт 8890 -->
         <div class="grid">
             <!-- 1. Дан камер -->
             <div class="video-box">
@@ -144,7 +144,7 @@
                     <span>Дан Камер (FG1183082)</span>
                     <span class="badge">LIVE</span>
                 </div>
-                <iframe src="http://202.131.225.19:8889/cam1"></iframe>
+                <iframe src="http://202.131.225.19:8890/cam1"></iframe>
             </div>
 
             <!-- 2. NVR Камер 1 -->
@@ -153,7 +153,7 @@
                     <span>NVR - Камер 1 (GB5857342)</span>
                     <span class="badge">LIVE</span>
                 </div>
-                <iframe src="http://202.131.225.19:8889/cam2"></iframe>
+                <iframe src="http://202.131.225.19:8890/cam2"></iframe>
             </div>
 
             <!-- 3. NVR Камер 2 -->
@@ -162,7 +162,7 @@
                     <span>NVR - Камер 2 (GB5857342)</span>
                     <span class="badge">LIVE</span>
                 </div>
-                <iframe src="http://202.131.225.19:8889/cam3"></iframe>
+                <iframe src="http://202.131.225.19:8890/cam3"></iframe>
             </div>
 
             <!-- 4. NVR Камер 3 -->
@@ -171,13 +171,14 @@
                     <span>NVR - Камер 3 (GB5857342)</span>
                     <span class="badge">LIVE</span>
                 </div>
-                <iframe src="http://202.131.225.19:8889/cam4"></iframe>
+                <iframe src="http://202.131.225.19:8890/cam4"></iframe>
             </div>
         </div>
     </div>
 
     <script>
-        const API_HOST = "http://202.131.225.19:8080";
+        // PTZ команд илгээх порт: 8891
+        const API_HOST = "http://202.131.225.19:8891";
 
         function sendPTZ(cmd) {
             const selectVal = document.getElementById("targetCam").value;
