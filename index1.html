@@ -2,59 +2,74 @@
 <html lang="mn">
 <head>
     <meta charset="UTF-8">
-    <title>TandemVu Dual Camera Live</title>
-    <script src="https://open.ys7.com/sdk/js/2.0/ezuikit.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Camera Monitor</title>
     <style>
-        body { background: #111; color: white; font-family: sans-serif; text-align: center; }
-        .stream-grid { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
-        .video-box { width: 640px; height: 360px; background: #000; border-radius: 8px; overflow: hidden; }
+        body {
+            background-color: #0b0f19;
+            color: #ffffff;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 15px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #1e293b;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+        .title {
+            padding: 10px;
+            font-size: 14px;
+            background: #111827;
+            text-align: left;
+        }
+        iframe {
+            width: 100%;
+            height: 260px;
+            border: none;
+            display: block;
+        }
     </style>
 </head>
 <body>
 
-    <h2>TandemVu Live Stream (P2P Low-Latency)</h2>
+    <h2>Хяналтын Камерууд (Шууд)</h2>
 
-    <div class="stream-grid">
-        <!-- 1-р суваг: Panoramic өргөн дуран -->
-        <div>
-            <h3>1. Panoramic Дуран</h3>
-            <div id="video-panoramic" class="video-box"></div>
+    <div class="grid">
+        <!-- Дан камер -->
+        <div class="card">
+            <div class="title">Камер 1 (FG1183082)</div>
+            <!-- HTTPS домэйн эсвэл IP хаягаа бичнэ -->
+            <iframe src="https://таны-домэйн:8889/FG1183082_cam1"></iframe>
         </div>
 
-        <!-- 2-р суваг: 25X PTZ эргэдэг дуран -->
-        <div>
-            <h3>2. PTZ 25X Дуран</h3>
-            <div id="video-ptz" class="video-box"></div>
+        <!-- NVR суваг 1 -->
+        <div class="card">
+            <div class="title">NVR - Камер 1 (GB5857342)</div>
+            <iframe src="https://таны-домэйн:8889/GB5857342_cam1"></iframe>
+        </div>
+
+        <!-- NVR суваг 2 -->
+        <div class="card">
+            <div class="title">NVR - Камер 2 (GB5857342)</div>
+            <iframe src="https://таны-домэйн:8889/GB5857342_cam2"></iframe>
+        </div>
+
+        <!-- NVR суваг 3 -->
+        <div class="card">
+            <div class="title">NVR - Камер 3 (GB5857342)</div>
+            <iframe src="https://таны-домэйн:8889/GB5857342_cam3"></iframe>
         </div>
     </div>
 
-    <script>
-        const SERIAL_NO = "GK4145227";           // Таны камерын сериал
-        const VERIFY_CODE = "123456";       // Таны тавьсан Verification Code
-        const ACCESS_TOKEN = "ТАНЫ_ACCESS_TOKEN"; // Hik-Connect Developer Token
-
-        // 1-р суваг (Panoramic)
-        var player1 = new EZUIKit.EZUIPlayer({
-            id: 'video-panoramic',
-            autoplay: true,
-            url: `ezopen://${VERIFY_CODE}@open.hik-connect.com/${SERIAL_NO}/1.live`,
-            accessToken: ACCESS_TOKEN,
-            width: 640,
-            height: 360
-        });
-
-        // 2-р суваг (PTZ)
-        var player2 = new EZUIKit.EZUIPlayer({
-            id: 'video-ptz',
-            autoplay: true,
-            url: `ezopen://${VERIFY_CODE}@open.hik-connect.com/${SERIAL_NO}/2.live`,
-            accessToken: ACCESS_TOKEN,
-            width: 640,
-            height: 360
-        });
-
-        player1.play();
-        player2.play();
-    </script>
 </body>
 </html>
