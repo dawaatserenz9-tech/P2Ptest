@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camera & NVR Live Monitor</title>
+    <title>Live Camera Monitor (On-Demand)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
@@ -14,31 +14,89 @@
             text-align: center; 
         }
         .container { 
-            max-width: 1500px; 
+            max-width: 1000px; 
             margin: 0 auto; 
             display: flex; 
             flex-direction: column; 
-            gap: 20px; 
+            gap: 18px; 
         }
-        
-        /* PTZ Удирдлага */
+
+        /* Камер сонгох товчлуурууд */
+        .cam-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .cam-btn {
+            background: #1e293b;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .cam-btn:hover { background: #334155; color: #fff; }
+        .cam-btn.active {
+            background: #0284c7;
+            color: #fff;
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+        }
+
+        /* Видео дэлгэц */
+        .video-wrapper {
+            background: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #334155;
+            position: relative;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+        }
+        .video-header {
+            padding: 12px 18px;
+            background: #111827;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .badge {
+            background: #16a34a;
+            color: #fff;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 9999px;
+        }
+        iframe {
+            width: 100%;
+            height: 520px;
+            border: none;
+            background: #000;
+            display: block;
+        }
+
+        /* PTZ картын хэсэг */
         .ptz-card {
             background: #1e293b;
             border: 1px solid #334155;
-            padding: 16px 24px;
+            padding: 16px;
             border-radius: 12px;
             display: inline-block;
             margin: 0 auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         .controls-grid {
             display: grid;
-            grid-template-columns: repeat(3, 75px);
+            grid-template-columns: repeat(3, 80px);
             grid-gap: 8px;
             justify-content: center;
-            margin: 12px 0;
+            margin: 10px 0;
         }
-        button {
+        .ptz-btn {
             background: #38bdf8;
             color: #0f172a;
             border: none;
@@ -47,224 +105,122 @@
             font-weight: bold;
             font-size: 13px;
             cursor: pointer;
-            transition: background 0.15s;
         }
-        button:hover { background: #7dd3fc; }
-        button:active { background: #0284c7; }
+        .ptz-btn:hover { background: #7dd3fc; }
+        .ptz-btn:active { background: #0284c7; }
         .zoom-group { display: flex; justify-content: center; gap: 12px; }
-        select { 
-            padding: 8px 12px; 
-            border-radius: 6px; 
-            background: #0f172a; 
-            color: #fff; 
-            border: 1px solid #475569; 
-            outline: none;
-            font-size: 14px;
-        }
-
-        /* Дэлгэцийн тор */
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); 
-            gap: 16px; 
-        }
-        .video-box { 
-            background: #1e293b; 
-            border-radius: 10px; 
-            overflow: hidden; 
-            border: 1px solid #334155; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-            display: flex;
-            flex-direction: column;
-        }
-        .video-box:fullscreen {
-            border-radius: 0;
-            border: none;
-        }
-        .video-box:fullscreen iframe {
-            height: 100vh;
-        }
-        .video-header {
-            padding: 8px 14px;
-            background: #111827;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .badge {
-            background: #16a34a;
-            color: #fff;
-            font-size: 10px;
-            padding: 3px 8px;
-            border-radius: 9999px;
-        }
         .expand-btn {
             background: #334155;
             color: #fff;
             border: 1px solid #475569;
-            padding: 4px 8px;
+            padding: 4px 10px;
             font-size: 12px;
             border-radius: 4px;
             cursor: pointer;
-        }
-        .expand-btn:hover { background: #475569; }
-        iframe { 
-            width: 100%; 
-            height: 280px; 
-            border: none; 
-            background: #000; 
-            display: block; 
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Хяналтын Камерууд (Шууд Дүрс & PTZ)</h2>
+        <h2>Шууд Хяналтын Дэлгэц (Нэг Сувгийн Тогтвортой Горим)</h2>
 
-        <!-- PTZ Удирдлага (NVR-ийн 5 сувагтай) -->
-        <div class="ptz-card">
-            <div>
-                <label>Удирдах камер: </label>
-                <select id="targetCam">
-                    <option value="FG1183082:1">Дан Камер (FG1183082)</option>
-                    <option value="GB5857342:1">NVR - Камер 1</option>
-                    <option value="GB5857342:2">NVR - Камер 2</option>
-                    <option value="GB5857342:3">NVR - Камер 3</option>
-                    <option value="GB5857342:4">NVR - Камер 4</option>
-                    <option value="GB5857342:5">NVR - Камер 5</option>
-                </select>
+        <!-- Камер сэлгэх товчлуурууд -->
+        <div class="cam-selector">
+            <button class="cam-btn active" onclick="selectCamera('FG1183082', 1, 'Дан Камер', this)">Дан Камер (FG1183082)</button>
+            <button class="cam-btn" onclick="selectCamera('GB5857342', 8, 'NVR - Камер 8 (D8)', this)">NVR - Камер 8</button>
+            <button class="cam-btn" onclick="selectCamera('GB5857342', 2, 'NVR - Камер 2 (D2)', this)">NVR - Камер 2</button>
+            <button class="cam-btn" onclick="selectCamera('GB5857342', 3, 'NVR - Камер 3 (D3)', this)">NVR - Камер 3</button>
+            <button class="cam-btn" onclick="selectCamera('GB5857342', 4, 'NVR - Камер 4 (D4)', this)">NVR - Камер 4</button>
+            <button class="cam-btn" onclick="selectCamera('GB5857342', 5, 'NVR - Камер 5 (D5)', this)">NVR - Камер 5</button>
+        </div>
+
+        <!-- Гол Дэлгэц -->
+        <div class="video-wrapper" id="playerWrapper">
+            <div class="video-header">
+                <span id="currentCamTitle">Дан Камер (FG1183082)</span>
+                <div>
+                    <span class="badge" id="statusBadge">ШУУД</span>
+                    <button class="expand-btn" onclick="toggleFullScreen('playerWrapper')">⛶ Бүтэн дэлгэц</button>
+                </div>
             </div>
+            <!-- Ганц сувгийн Live урсгал -->
+            <iframe id="livePlayer" src="https://walked-snapshot-mark-coating.trycloudflare.com/live" allow="fullscreen; autoplay"></iframe>
+        </div>
 
+        <!-- PTZ удирдлага (Идэвхтэй камер луу автоматаар чиглэнэ) -->
+        <div class="ptz-card">
+            <span style="font-size: 13px; color: #94a3b8;">Идэвхтэй камерын PTZ удирдлага</span>
             <div class="controls-grid">
                 <div></div>
-                <button onclick="sendPTZ('up')">▲ Дээш</button>
+                <button class="ptz-btn" onclick="sendPTZ('up')">▲ Дээш</button>
                 <div></div>
-                <button onclick="sendPTZ('left')">◀ Зүүн</button>
+                <button class="ptz-btn" onclick="sendPTZ('left')">◀ Зүүн</button>
                 <div style="display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:12px;">PTZ</div>
-                <button onclick="sendPTZ('right')">Баруун ▶</button>
+                <button class="ptz-btn" onclick="sendPTZ('right')">Баруун ▶</button>
                 <div></div>
-                <button onclick="sendPTZ('down')">▼ Доош</button>
+                <button class="ptz-btn" onclick="sendPTZ('down')">▼ Доош</button>
                 <div></div>
             </div>
 
             <div class="zoom-group">
-                <button onclick="sendPTZ('zoomin')">🔍 Zoom In (+)</button>
-                <button onclick="sendPTZ('zoomout')">🔎 Zoom Out (-)</button>
-            </div>
-        </div>
-
-        <!-- 6 Камерын тор (1 Дан Камер + NVR-ийн 5 Камер) -->
-        <div class="grid">
-            <!-- Дан Камер -->
-            <div class="video-box" id="box-cam1" ondblclick="toggleFullScreen('box-cam1')">
-                <div class="video-header">
-                    <span>Дан Камер (FG1183082)</span>
-                    <div class="header-actions">
-                        <span class="badge">LIVE</span>
-                        <button class="expand-btn" onclick="toggleFullScreen('box-cam1')" title="Бүтэн дэлгэц">⛶ Томруулах</button>
-                    </div>
-                </div>
-                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam1" allow="fullscreen; autoplay"></iframe>
-            </div>
-
-            <!-- NVR Камер 1 -->
-            <div class="video-box" id="box-cam2" ondblclick="toggleFullScreen('box-cam2')">
-                <div class="video-header">
-                    <span>NVR - Камер 1 (D1)</span>
-                    <div class="header-actions">
-                        <span class="badge">LIVE</span>
-                        <button class="expand-btn" onclick="toggleFullScreen('box-cam2')" title="Бүтэн дэлгэц">⛶ Томруулах</button>
-                    </div>
-                </div>
-                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam2" allow="fullscreen; autoplay"></iframe>
-            </div>
-
-            <!-- NVR Камер 2 -->
-            <div class="video-box" id="box-cam3" ondblclick="toggleFullScreen('box-cam3')">
-                <div class="video-header">
-                    <span>NVR - Камер 2 (D2)</span>
-                    <div class="header-actions">
-                        <span class="badge">LIVE</span>
-                        <button class="expand-btn" onclick="toggleFullScreen('box-cam3')" title="Бүтэн дэлгэц">⛶ Томруулах</button>
-                    </div>
-                </div>
-                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam3" allow="fullscreen; autoplay"></iframe>
-            </div>
-
-            <!-- NVR Камер 3 -->
-            <div class="video-box" id="box-cam4" ondblclick="toggleFullScreen('box-cam4')">
-                <div class="video-header">
-                    <span>NVR - Камер 3 (D3)</span>
-                    <div class="header-actions">
-                        <span class="badge">LIVE</span>
-                        <button class="expand-btn" onclick="toggleFullScreen('box-cam4')" title="Бүтэн дэлгэц">⛶ Томруулах</button>
-                    </div>
-                </div>
-                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam4" allow="fullscreen; autoplay"></iframe>
-            </div>
-
-            <!-- NVR Камер 4 -->
-            <div class="video-box" id="box-cam5" ondblclick="toggleFullScreen('box-cam5')">
-                <div class="video-header">
-                    <span>NVR - Камер 4 (D4)</span>
-                    <div class="header-actions">
-                        <span class="badge">LIVE</span>
-                        <button class="expand-btn" onclick="toggleFullScreen('box-cam5')" title="Бүтэн дэлгэц">⛶ Томруулах</button>
-                    </div>
-                </div>
-                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam5" allow="fullscreen; autoplay"></iframe>
-            </div>
-
-            <!-- NVR Камер 5 -->
-            <div class="video-box" id="box-cam6" ondblclick="toggleFullScreen('box-cam6')">
-                <div class="video-header">
-                    <span>NVR - Камер 5 (D5)</span>
-                    <div class="header-actions">
-                        <span class="badge">LIVE</span>
-                        <button class="expand-btn" onclick="toggleFullScreen('box-cam6')" title="Бүтэн дэлгэц">⛶ Томруулах</button>
-                    </div>
-                </div>
-                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam6" allow="fullscreen; autoplay"></iframe>
+                <button class="ptz-btn" onclick="sendPTZ('zoomin')">🔍 Zoom (+)</button>
+                <button class="ptz-btn" onclick="sendPTZ('zoomout')">🔎 Zoom (-)</button>
             </div>
         </div>
     </div>
 
     <script>
         const API_HOST = "https://knee-signs-gmc-simultaneously.trycloudflare.com";
+        const STREAM_URL = "https://walked-snapshot-mark-coating.trycloudflare.com/live";
 
-        // Бүтэн дэлгэцээр томруулах функц
+        let activeDev = "FG1183082";
+        let activeCh = 1;
+
+        function selectCamera(dev, ch, title, btn) {
+            activeDev = dev;
+            activeCh = ch;
+
+            // Товчны харагдах байдал өөрчлөх
+            document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.getElementById('currentCamTitle').innerText = title + " руу сэлгэж байна...";
+            document.getElementById('statusBadge').innerText = "ХОЛБОЖ БАЙНА...";
+            document.getElementById('statusBadge').style.background = "#d97706";
+
+            // Сервер рүү сэлгэх хүсэлт илгээх
+            fetch(`${API_HOST}/switch?dev=${dev}&ch=${ch}`)
+                .then(r => r.json())
+                .then(d => {
+                    // Сервер дээр урсгал тогтворжих хүртэл 2.5 секунд хүлээгээд тоглуулагчийг шинэчлэх
+                    setTimeout(() => {
+                        document.getElementById('livePlayer').src = `${STREAM_URL}?t=${Date.now()}`;
+                        document.getElementById('currentCamTitle').innerText = title;
+                        document.getElementById('statusBadge').innerText = "ШУУД";
+                        document.getElementById('statusBadge').style.background = "#16a34a";
+                    }, 2500);
+                })
+                .catch(e => {
+                    console.error("Сэлгэх алдаа:", e);
+                    document.getElementById('statusBadge').innerText = "АЛДАА";
+                    document.getElementById('statusBadge').style.background = "#dc2626";
+                });
+        }
+
+        function sendPTZ(cmd) {
+            fetch(`${API_HOST}/ptz?dev=${activeDev}&ch=${activeCh}&cmd=${cmd}`)
+                .then(r => r.json())
+                .catch(e => console.error("PTZ алдаа:", e));
+        }
+
         function toggleFullScreen(elemId) {
             const elem = document.getElementById(elemId);
             if (!document.fullscreenElement) {
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) {
-                    elem.webkitRequestFullscreen();
-                }
+                if (elem.requestFullscreen) elem.requestFullscreen();
             } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
+                if (document.exitFullscreen) document.exitFullscreen();
             }
-        }
-
-        // PTZ команд илгээх
-        function sendPTZ(cmd) {
-            const selectVal = document.getElementById("targetCam").value;
-            const [dev, ch] = selectVal.split(":");
-
-            fetch(`${API_HOST}/ptz?dev=${dev}&ch=${ch}&cmd=${cmd}`)
-                .then(r => r.json())
-                .then(data => console.log("PTZ command ok:", data))
-                .catch(e => console.error("PTZ алдаа:", e));
         }
     </script>
 </body>
