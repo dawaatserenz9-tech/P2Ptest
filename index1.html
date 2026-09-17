@@ -3,59 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NVR Camera & PTZ Controller</title>
+    <title>Camera & NVR Live Monitor</title>
     <style>
-        body { background: #0f172a; color: #f8fafc; font-family: sans-serif; padding: 20px; text-align: center; }
-        .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 15px; }
-        .card { background: #1e293b; border-radius: 8px; overflow: hidden; border: 1px solid #334155; }
-        .title { padding: 10px; font-weight: bold; background: #111827; }
-        iframe { width: 100%; height: 260px; border: none; display: block; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            background: #0f172a; 
+            color: #f8fafc; 
+            font-family: sans-serif; 
+            padding: 20px; 
+            text-align: center; 
+        }
+        .container { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
         
-        /* PTZ Удирдлагын самбар */
-        .ptz-panel {
+        /* PTZ Удирдлага */
+        .ptz-card {
             background: #1e293b;
             border: 1px solid #334155;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             display: inline-block;
             margin: 0 auto;
         }
         .controls-grid {
             display: grid;
-            grid-template-columns: repeat(3, 70px);
-            grid-gap: 10px;
+            grid-template-columns: repeat(3, 75px);
+            grid-gap: 8px;
             justify-content: center;
-            margin: 15px 0;
+            margin: 12px 0;
         }
         button {
             background: #38bdf8;
             color: #0f172a;
             border: none;
-            padding: 12px;
+            padding: 10px;
             border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
-            user-select: none;
         }
         button:hover { background: #7dd3fc; }
         button:active { background: #0284c7; }
-        .zoom-group { display: flex; justify-content: center; gap: 15px; }
-        select { padding: 8px; border-radius: 4px; background: #0f172a; color: white; border: 1px solid #475569; }
+        .zoom-group { display: flex; justify-content: center; gap: 10px; }
+        select { 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            background: #0b0f19; 
+            color: #fff; 
+            border: 1px solid #475569; 
+        }
+
+        /* Камеруудын дэлгэц */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); 
+            gap: 15px; 
+        }
+        .video-box { 
+            background: #1e293b; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            border: 1px solid #334155; 
+        }
+        .video-header {
+            padding: 10px 14px;
+            background: #111827;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+        .badge {
+            background: #16a34a;
+            color: #fff;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        iframe { 
+            width: 100%; 
+            height: 280px; 
+            border: none; 
+            background: #000; 
+            display: block; 
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Хяналтын Камерууд & PTZ Удирдлага</h2>
+        <h2>Хяналтын Камерууд (Шууд Дүрс & PTZ)</h2>
 
-        <!-- PTZ Удирдах самбар -->
-        <div class="ptz-panel">
-            <h3>🎮 Камер Удирдах Самбар</h3>
-            <div style="margin-top: 10px;">
-                <label>Төхөөрөмж ба Суваг сонгох: </label>
+        <!-- PTZ удирдлагын хэсэг -->
+        <div class="ptz-card">
+            <div>
+                <label>Удирдах камер: </label>
                 <select id="targetCam">
-                    <option value="FG1183082:1">Дан Камер (FG1183082 - Суваг 1)</option>
+                    <option value="FG1183082:1">Дан Камер (FG1183082)</option>
                     <option value="GB5857342:1">NVR - Камер 1</option>
                     <option value="GB5857342:2">NVR - Камер 2</option>
                     <option value="GB5857342:3">NVR - Камер 3</option>
@@ -63,58 +105,74 @@
                 </select>
             </div>
 
-            <!-- Чиглэлийн товчнууд -->
             <div class="controls-grid">
                 <div></div>
                 <button onclick="sendPTZ('up')">▲ Дээш</button>
                 <div></div>
                 <button onclick="sendPTZ('left')">◀ Зүүн</button>
-                <div style="display:flex; align-items:center; justify-content:center; color:#94a3b8;">PTZ</div>
+                <div style="display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:12px;">PTZ</div>
                 <button onclick="sendPTZ('right')">Баруун ▶</button>
                 <div></div>
                 <button onclick="sendPTZ('down')">▼ Доош</button>
                 <div></div>
             </div>
 
-            <!-- Zoom товчнууд -->
             <div class="zoom-group">
                 <button onclick="sendPTZ('zoomin')">🔍 Zoom In (+)</button>
                 <button onclick="sendPTZ('zoomout')">🔎 Zoom Out (-)</button>
             </div>
         </div>
 
-        <!-- Дүрс харах хэсэг -->
+        <!-- Дүрс харуулах хэсэг -->
         <div class="grid">
-            <div class="card">
-                <div class="title">Дан Камер (FG1183082)</div>
+            <!-- 1. Дан камер -->
+            <div class="video-box">
+                <div class="video-header">
+                    <span>Дан Камер (FG1183082)</span>
+                    <span class="badge">LIVE</span>
+                </div>
                 <iframe src="http://202.131.225.19:8889/FG1183082_cam1"></iframe>
             </div>
-            <div class="card">
-                <div class="title">NVR - Камер 1 (GB5857342)</div>
+
+            <!-- 2. NVR Камер 1 -->
+            <div class="video-box">
+                <div class="video-header">
+                    <span>NVR - Камер 1 (GB5857342)</span>
+                    <span class="badge">LIVE</span>
+                </div>
                 <iframe src="http://202.131.225.19:8889/GB5857342_cam1"></iframe>
             </div>
-            <div class="card">
-                <div class="title">NVR - Камер 2 (GB5857342)</div>
+
+            <!-- 3. NVR Камер 2 -->
+            <div class="video-box">
+                <div class="video-header">
+                    <span>NVR - Камер 2 (GB5857342)</span>
+                    <span class="badge">LIVE</span>
+                </div>
                 <iframe src="http://202.131.225.19:8889/GB5857342_cam2"></iframe>
             </div>
-            <div class="card">
-                <div class="title">NVR - Камер 3 (GB5857342)</div>
+
+            <!-- 4. NVR Камер 3 -->
+            <div class="video-box">
+                <div class="video-header">
+                    <span>NVR - Камер 3 (GB5857342)</span>
+                    <span class="badge">LIVE</span>
+                </div>
                 <iframe src="http://202.131.225.19:8889/GB5857342_cam3"></iframe>
             </div>
         </div>
     </div>
 
     <script>
-        const API_BASE = "http://202.131.225.19:8080";
+        const API_HOST = "http://202.131.225.19:8080";
 
         function sendPTZ(cmd) {
-            const select = document.getElementById("targetCam").value;
-            const [dev, ch] = select.split(":");
+            const selectVal = document.getElementById("targetCam").value;
+            const [dev, ch] = selectVal.split(":");
 
-            fetch(`${API_BASE}/ptz?dev=${dev}&ch=${ch}&cmd=${cmd}`)
-                .then(res => res.json())
-                .then(data => console.log("PTZ Хариу:", data))
-                .catch(err => console.error("Хүсэлт илгээхэд алдаа гарлаа:", err));
+            fetch(`${API_HOST}/ptz?dev=${dev}&ch=${ch}&cmd=${cmd}`)
+                .then(r => r.json())
+                .catch(e => console.error("PTZ Алдаа:", e));
         }
     </script>
 </body>
