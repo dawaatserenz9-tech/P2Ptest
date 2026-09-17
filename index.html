@@ -2,59 +2,120 @@
 <html lang="mn">
 <head>
     <meta charset="UTF-8">
-    <title>TandemVu Dual Camera Live</title>
-    <script src="https://open.ys7.com/sdk/js/2.0/ezuikit.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NVR Camera & PTZ Controller</title>
     <style>
-        body { background: #111; color: white; font-family: sans-serif; text-align: center; }
-        .stream-grid { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
-        .video-box { width: 640px; height: 360px; background: #000; border-radius: 8px; overflow: hidden; }
+        body { background: #0f172a; color: #f8fafc; font-family: sans-serif; padding: 20px; text-align: center; }
+        .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 15px; }
+        .card { background: #1e293b; border-radius: 8px; overflow: hidden; border: 1px solid #334155; }
+        .title { padding: 10px; font-weight: bold; background: #111827; }
+        iframe { width: 100%; height: 260px; border: none; display: block; }
+        
+        /* PTZ Удирдлагын самбар */
+        .ptz-panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 0 auto;
+        }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 70px);
+            grid-gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        button {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+        }
+        button:hover { background: #7dd3fc; }
+        button:active { background: #0284c7; }
+        .zoom-group { display: flex; justify-content: center; gap: 15px; }
+        select { padding: 8px; border-radius: 4px; background: #0f172a; color: white; border: 1px solid #475569; }
     </style>
 </head>
 <body>
 
-    <h2>TandemVu Live Stream (P2P Low-Latency)</h2>
+    <div class="container">
+        <h2>Хяналтын Камерууд & PTZ Удирдлага</h2>
 
-    <div class="stream-grid">
-        <!-- 1-р суваг: Panoramic өргөн дуран -->
-        <div>
-            <h3>1. Panoramic Дуран</h3>
-            <div id="video-panoramic" class="video-box"></div>
+        <!-- PTZ Удирдах самбар -->
+        <div class="ptz-panel">
+            <h3>🎮 Камер Удирдах Самбар</h3>
+            <div style="margin-top: 10px;">
+                <label>Төхөөрөмж ба Суваг сонгох: </label>
+                <select id="targetCam">
+                    <option value="FG1183082:1">Дан Камер (FG1183082 - Суваг 1)</option>
+                    <option value="GB5857342:1">NVR - Камер 1</option>
+                    <option value="GB5857342:2">NVR - Камер 2</option>
+                    <option value="GB5857342:3">NVR - Камер 3</option>
+                    <option value="GB5857342:4">NVR - Камер 4</option>
+                </select>
+            </div>
+
+            <!-- Чиглэлийн товчнууд -->
+            <div class="controls-grid">
+                <div></div>
+                <button onclick="sendPTZ('up')">▲ Дээш</button>
+                <div></div>
+                <button onclick="sendPTZ('left')">◀ Зүүн</button>
+                <div style="display:flex; align-items:center; justify-content:center; color:#94a3b8;">PTZ</div>
+                <button onclick="sendPTZ('right')">Баруун ▶</button>
+                <div></div>
+                <button onclick="sendPTZ('down')">▼ Доош</button>
+                <div></div>
+            </div>
+
+            <!-- Zoom товчнууд -->
+            <div class="zoom-group">
+                <button onclick="sendPTZ('zoomin')">🔍 Zoom In (+)</button>
+                <button onclick="sendPTZ('zoomout')">🔎 Zoom Out (-)</button>
+            </div>
         </div>
 
-        <!-- 2-р суваг: 25X PTZ эргэдэг дуран -->
-        <div>
-            <h3>2. PTZ 25X Дуран</h3>
-            <div id="video-ptz" class="video-box"></div>
+        <!-- Дүрс харах хэсэг -->
+        <div class="grid">
+            <div class="card">
+                <div class="title">Дан Камер (FG1183082)</div>
+                <iframe src="http://202.131.225.19:8889/FG1183082_cam1"></iframe>
+            </div>
+            <div class="card">
+                <div class="title">NVR - Камер 1 (GB5857342)</div>
+                <iframe src="http://202.131.225.19:8889/GB5857342_cam1"></iframe>
+            </div>
+            <div class="card">
+                <div class="title">NVR - Камер 2 (GB5857342)</div>
+                <iframe src="http://202.131.225.19:8889/GB5857342_cam2"></iframe>
+            </div>
+            <div class="card">
+                <div class="title">NVR - Камер 3 (GB5857342)</div>
+                <iframe src="http://202.131.225.19:8889/GB5857342_cam3"></iframe>
+            </div>
         </div>
     </div>
 
     <script>
-        const SERIAL_NO = "GK4145227";           // Таны камерын сериал
-        const VERIFY_CODE = "123456";       // Таны тавьсан Verification Code
-        const ACCESS_TOKEN = "ТАНЫ_ACCESS_TOKEN"; // Hik-Connect Developer Token
+        const API_BASE = "http://202.131.225.19:8080";
 
-        // 1-р суваг (Panoramic)
-        var player1 = new EZUIKit.EZUIPlayer({
-            id: 'video-panoramic',
-            autoplay: true,
-            url: `ezopen://${VERIFY_CODE}@open.hik-connect.com/${SERIAL_NO}/1.live`,
-            accessToken: ACCESS_TOKEN,
-            width: 640,
-            height: 360
-        });
+        function sendPTZ(cmd) {
+            const select = document.getElementById("targetCam").value;
+            const [dev, ch] = select.split(":");
 
-        // 2-р суваг (PTZ)
-        var player2 = new EZUIKit.EZUIPlayer({
-            id: 'video-ptz',
-            autoplay: true,
-            url: `ezopen://${VERIFY_CODE}@open.hik-connect.com/${SERIAL_NO}/2.live`,
-            accessToken: ACCESS_TOKEN,
-            width: 640,
-            height: 360
-        });
-
-        player1.play();
-        player2.play();
+            fetch(`${API_BASE}/ptz?dev=${dev}&ch=${ch}&cmd=${cmd}`)
+                .then(res => res.json())
+                .then(data => console.log("PTZ Хариу:", data))
+                .catch(err => console.error("Хүсэлт илгээхэд алдаа гарлаа:", err));
+        }
     </script>
 </body>
 </html>
