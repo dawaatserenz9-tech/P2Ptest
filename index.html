@@ -14,13 +14,14 @@
             text-align: center; 
         }
         .container { 
-            max-width: 1400px; 
+            max-width: 1500px; 
             margin: 0 auto; 
             display: flex; 
             flex-direction: column; 
-            gap: 24px; 
+            gap: 20px; 
         }
         
+        /* PTZ Удирдлага */
         .ptz-card {
             background: #1e293b;
             border: 1px solid #334155;
@@ -35,7 +36,7 @@
             grid-template-columns: repeat(3, 75px);
             grid-gap: 8px;
             justify-content: center;
-            margin: 14px 0;
+            margin: 12px 0;
         }
         button {
             background: #38bdf8;
@@ -61,9 +62,10 @@
             font-size: 14px;
         }
 
+        /* Дэлгэцийн тор */
         .grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); 
+            grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); 
             gap: 16px; 
         }
         .video-box { 
@@ -72,9 +74,18 @@
             overflow: hidden; 
             border: 1px solid #334155; 
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+        }
+        .video-box:fullscreen {
+            border-radius: 0;
+            border: none;
+        }
+        .video-box:fullscreen iframe {
+            height: 100vh;
         }
         .video-header {
-            padding: 10px 14px;
+            padding: 8px 14px;
             background: #111827;
             font-size: 13px;
             font-weight: 600;
@@ -82,14 +93,28 @@
             justify-content: space-between;
             align-items: center;
         }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         .badge {
             background: #16a34a;
             color: #fff;
             font-size: 10px;
             padding: 3px 8px;
             border-radius: 9999px;
-            letter-spacing: 0.5px;
         }
+        .expand-btn {
+            background: #334155;
+            color: #fff;
+            border: 1px solid #475569;
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .expand-btn:hover { background: #475569; }
         iframe { 
             width: 100%; 
             height: 280px; 
@@ -104,7 +129,7 @@
     <div class="container">
         <h2>Хяналтын Камерууд (Шууд Дүрс & PTZ)</h2>
 
-        <!-- PTZ удирдлага -->
+        <!-- PTZ Удирдлага (NVR-ийн 5 сувагтай) -->
         <div class="ptz-card">
             <div>
                 <label>Удирдах камер: </label>
@@ -113,6 +138,8 @@
                     <option value="GB5857342:1">NVR - Камер 1</option>
                     <option value="GB5857342:2">NVR - Камер 2</option>
                     <option value="GB5857342:3">NVR - Камер 3</option>
+                    <option value="GB5857342:4">NVR - Камер 4</option>
+                    <option value="GB5857342:5">NVR - Камер 5</option>
                 </select>
             </div>
 
@@ -134,46 +161,102 @@
             </div>
         </div>
 
-        <!-- 4 Камерын шууд дүрс (Cloudflare HTTPS Түннель) -->
+        <!-- 6 Камерын тор (1 Дан Камер + NVR-ийн 5 Камер) -->
         <div class="grid">
-            <div class="video-box">
+            <!-- Дан Камер -->
+            <div class="video-box" id="box-cam1" ondblclick="toggleFullScreen('box-cam1')">
                 <div class="video-header">
                     <span>Дан Камер (FG1183082)</span>
-                    <span class="badge">LIVE</span>
+                    <div class="header-actions">
+                        <span class="badge">LIVE</span>
+                        <button class="expand-btn" onclick="toggleFullScreen('box-cam1')" title="Бүтэн дэлгэц">⛶ Томруулах</button>
+                    </div>
                 </div>
-                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam1"></iframe>
+                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam1" allow="fullscreen; autoplay"></iframe>
             </div>
 
-            <div class="video-box">
+            <!-- NVR Камер 1 -->
+            <div class="video-box" id="box-cam2" ondblclick="toggleFullScreen('box-cam2')">
                 <div class="video-header">
-                    <span>NVR - Камер 1 (GB5857342)</span>
-                    <span class="badge">LIVE</span>
+                    <span>NVR - Камер 1 (D1)</span>
+                    <div class="header-actions">
+                        <span class="badge">LIVE</span>
+                        <button class="expand-btn" onclick="toggleFullScreen('box-cam2')" title="Бүтэн дэлгэц">⛶ Томруулах</button>
+                    </div>
                 </div>
-                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam2"></iframe>
+                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam2" allow="fullscreen; autoplay"></iframe>
             </div>
 
-            <div class="video-box">
+            <!-- NVR Камер 2 -->
+            <div class="video-box" id="box-cam3" ondblclick="toggleFullScreen('box-cam3')">
                 <div class="video-header">
-                    <span>NVR - Камер 2 (GB5857342)</span>
-                    <span class="badge">LIVE</span>
+                    <span>NVR - Камер 2 (D2)</span>
+                    <div class="header-actions">
+                        <span class="badge">LIVE</span>
+                        <button class="expand-btn" onclick="toggleFullScreen('box-cam3')" title="Бүтэн дэлгэц">⛶ Томруулах</button>
+                    </div>
                 </div>
-                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam3"></iframe>
+                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam3" allow="fullscreen; autoplay"></iframe>
             </div>
 
-            <div class="video-box">
+            <!-- NVR Камер 3 -->
+            <div class="video-box" id="box-cam4" ondblclick="toggleFullScreen('box-cam4')">
                 <div class="video-header">
-                    <span>NVR - Камер 3 (GB5857342)</span>
-                    <span class="badge">LIVE</span>
+                    <span>NVR - Камер 3 (D3)</span>
+                    <div class="header-actions">
+                        <span class="badge">LIVE</span>
+                        <button class="expand-btn" onclick="toggleFullScreen('box-cam4')" title="Бүтэн дэлгэц">⛶ Томруулах</button>
+                    </div>
                 </div>
-                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam4"></iframe>
+                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam4" allow="fullscreen; autoplay"></iframe>
+            </div>
+
+            <!-- NVR Камер 4 -->
+            <div class="video-box" id="box-cam5" ondblclick="toggleFullScreen('box-cam5')">
+                <div class="video-header">
+                    <span>NVR - Камер 4 (D4)</span>
+                    <div class="header-actions">
+                        <span class="badge">LIVE</span>
+                        <button class="expand-btn" onclick="toggleFullScreen('box-cam5')" title="Бүтэн дэлгэц">⛶ Томруулах</button>
+                    </div>
+                </div>
+                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam5" allow="fullscreen; autoplay"></iframe>
+            </div>
+
+            <!-- NVR Камер 5 -->
+            <div class="video-box" id="box-cam6" ondblclick="toggleFullScreen('box-cam6')">
+                <div class="video-header">
+                    <span>NVR - Камер 5 (D5)</span>
+                    <div class="header-actions">
+                        <span class="badge">LIVE</span>
+                        <button class="expand-btn" onclick="toggleFullScreen('box-cam6')" title="Бүтэн дэлгэц">⛶ Томруулах</button>
+                    </div>
+                </div>
+                <iframe src="https://walked-snapshot-mark-coating.trycloudflare.com/cam6" allow="fullscreen; autoplay"></iframe>
             </div>
         </div>
     </div>
 
     <script>
-        // PTZ удирдлагын Cloudflare HTTPS түннель
         const API_HOST = "https://knee-signs-gmc-simultaneously.trycloudflare.com";
 
+        // Бүтэн дэлгэцээр томруулах функц
+        function toggleFullScreen(elemId) {
+            const elem = document.getElementById(elemId);
+            if (!document.fullscreenElement) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // PTZ команд илгээх
         function sendPTZ(cmd) {
             const selectVal = document.getElementById("targetCam").value;
             const [dev, ch] = selectVal.split(":");
