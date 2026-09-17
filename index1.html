@@ -3,41 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Camera Monitor (On-Demand)</title>
+    <title>Live Camera Monitor (12 Channels)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
             background: #0b0f19; 
             color: #f8fafc; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            padding: 20px; 
+            padding: 16px; 
             text-align: center; 
         }
         .container { 
-            max-width: 1000px; 
+            max-width: 1050px; 
             margin: 0 auto; 
             display: flex; 
             flex-direction: column; 
-            gap: 18px; 
+            gap: 16px; 
         }
 
-        /* Камер сонгох товчлуурууд */
-        .cam-selector {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
+        /* 12+ Камер сонгох тор (Grid) */
+        .selector-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 14px;
+            border-radius: 12px;
+        }
+        .selector-title {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .cam-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+            gap: 8px;
         }
         .cam-btn {
-            background: #1e293b;
-            color: #94a3b8;
+            background: #0f172a;
+            color: #cbd5e1;
             border: 1px solid #334155;
-            padding: 10px 16px;
-            border-radius: 8px;
+            padding: 9px 8px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 13px;
-            transition: all 0.2s;
+            font-size: 12px;
+            transition: all 0.15s ease-in-out;
+            white-space: nowrap;
         }
         .cam-btn:hover { background: #334155; color: #fff; }
         .cam-btn.active {
@@ -47,17 +60,16 @@
             box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
         }
 
-        /* Видео дэлгэц */
+        /* Видео тоглуулагч */
         .video-wrapper {
             background: #1e293b;
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid #334155;
-            position: relative;
             box-shadow: 0 4px 16px rgba(0,0,0,0.5);
         }
         .video-header {
-            padding: 12px 18px;
+            padding: 10px 16px;
             background: #111827;
             display: flex;
             justify-content: space-between;
@@ -71,6 +83,7 @@
             font-size: 11px;
             padding: 4px 10px;
             border-radius: 9999px;
+            letter-spacing: 0.5px;
         }
         iframe {
             width: 100%;
@@ -80,18 +93,18 @@
             display: block;
         }
 
-        /* PTZ картын хэсэг */
+        /* PTZ Удирдлага */
         .ptz-card {
             background: #1e293b;
             border: 1px solid #334155;
-            padding: 16px;
+            padding: 14px;
             border-radius: 12px;
             display: inline-block;
             margin: 0 auto;
         }
         .controls-grid {
             display: grid;
-            grid-template-columns: repeat(3, 80px);
+            grid-template-columns: repeat(3, 75px);
             grid-gap: 8px;
             justify-content: center;
             margin: 10px 0;
@@ -118,24 +131,38 @@
             border-radius: 4px;
             cursor: pointer;
         }
+        .expand-btn:hover { background: #475569; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Шууд Хяналтын Дэлгэц (Нэг Сувгийн Тогтвортой Горим)</h2>
+        <h2>Хяналтын Дэлгэц (12+ Суваг Сэлгэх Горим)</h2>
 
-        <!-- Камер сэлгэх товчлуурууд -->
-        <div class="cam-selector">
-            <button class="cam-btn active" onclick="selectCamera('FG1183082', 1, 'Дан Камер', this)">Дан Камер (FG1183082)</button>
-            <button class="cam-btn" onclick="selectCamera('GB5857342', 8, 'NVR - Камер 8 (D8)', this)">NVR - Камер 8</button>
-            <button class="cam-btn" onclick="selectCamera('GB5857342', 2, 'NVR - Камер 2 (D2)', this)">NVR - Камер 2</button>
-            <button class="cam-btn" onclick="selectCamera('GB5857342', 3, 'NVR - Камер 3 (D3)', this)">NVR - Камер 3</button>
-            <button class="cam-btn" onclick="selectCamera('GB5857342', 4, 'NVR - Камер 4 (D4)', this)">NVR - Камер 4</button>
-            <button class="cam-btn" onclick="selectCamera('GB5857342', 5, 'NVR - Камер 5 (D5)', this)">NVR - Камер 5</button>
+        <!-- Камер сонгох хэсэг -->
+        <div class="selector-card">
+            <div class="selector-title">Камер сонгох:</div>
+            <div class="cam-grid">
+                <!-- Дан Камер -->
+                <button class="cam-btn active" onclick="selectCamera('FG1183082', 1, 'Дан Камер (FG1183082)', this)">Дан Камер</button>
+                
+                <!-- NVR 12 Камер -->
+                <button class="cam-btn" onclick="selectCamera('GB5857342', 1, 'NVR - Камер 1 (D1)', this)">NVR - Камер 1</button>
+                <button class="cam-btn" onclick="selectCamera('GB5857342', 2, 'NVR - Камер 2 (D2)', this)">NVR - Камер 2</button>
+                <button class="cam-btn" onclick="selectCamera('GB5857342', 3, 'NVR - Камер 3 (D3)', this)">NVR - Камер 3</button>
+                <button class="cam-btn" onclick="selectCamera('GB5857342', 4, 'NVR - Камер 4 (D4)', this)">NVR - Камер 4</button>
+                <button class="cam-btn" onclick="selectCamera('GB5857342', 5, 'NVR - Камер 5 (D5)', this)">NVR - Камер 5</button>
+                <button class="cam-btn" onclick="selectCamera('GB5857342', 6, 'NVR - Камер 6 (D6)', this)">NVR - Камер 6</button>
+                <button class="cam-btn" onclick="selectCamera('GB5857342', 7, 'NVR - Камер 7 (D7)', this)">NVR - Камер 7</button>
+                <button class="cam-btn" onclick="selectCamera('GB5857342', 8, 'NVR - Камер 8 (D8)', this)">NVR - Камер 8</button>
+                <button class="cam-btn" onclick="selectCamera('GB5857342', 9, 'NVR - Камер 9 (D9)', this)">NVR - Камер 9</button>
+                <button class="cam-btn" onclick="selectCamera('GB5857342', 10, 'NVR - Камер 10 (D10)', this)">NVR - Камер 10</button>
+                <button class="cam-btn" onclick="selectCamera('GB5857342', 11, 'NVR - Камер 11 (D11)', this)">NVR - Камер 11</button>
+                <button class="cam-btn" onclick="selectCamera('GB5857342', 12, 'NVR - Камер 12 (D12)', this)">NVR - Камер 12</button>
+            </div>
         </div>
 
-        <!-- Гол Дэлгэц -->
+        <!-- Видео дэлгэц -->
         <div class="video-wrapper" id="playerWrapper">
             <div class="video-header">
                 <span id="currentCamTitle">Дан Камер (FG1183082)</span>
@@ -144,11 +171,10 @@
                     <button class="expand-btn" onclick="toggleFullScreen('playerWrapper')">⛶ Бүтэн дэлгэц</button>
                 </div>
             </div>
-            <!-- Ганц сувгийн Live урсгал -->
             <iframe id="livePlayer" src="https://walked-snapshot-mark-coating.trycloudflare.com/live" allow="fullscreen; autoplay"></iframe>
         </div>
 
-        <!-- PTZ удирдлага (Идэвхтэй камер луу автоматаар чиглэнэ) -->
+        <!-- Идэвхтэй камерын PTZ удирдлага -->
         <div class="ptz-card">
             <span style="font-size: 13px; color: #94a3b8;">Идэвхтэй камерын PTZ удирдлага</span>
             <div class="controls-grid">
@@ -181,7 +207,6 @@
             activeDev = dev;
             activeCh = ch;
 
-            // Товчны харагдах байдал өөрчлөх
             document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
@@ -189,11 +214,9 @@
             document.getElementById('statusBadge').innerText = "ХОЛБОЖ БАЙНА...";
             document.getElementById('statusBadge').style.background = "#d97706";
 
-            // Сервер рүү сэлгэх хүсэлт илгээх
             fetch(`${API_HOST}/switch?dev=${dev}&ch=${ch}`)
                 .then(r => r.json())
                 .then(d => {
-                    // Сервер дээр урсгал тогтворжих хүртэл 2.5 секунд хүлээгээд тоглуулагчийг шинэчлэх
                     setTimeout(() => {
                         document.getElementById('livePlayer').src = `${STREAM_URL}?t=${Date.now()}`;
                         document.getElementById('currentCamTitle').innerText = title;
