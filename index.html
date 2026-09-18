@@ -40,10 +40,11 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 13px;
+            transition: background 0.2s;
         }
         .refresh-btn:hover { background: #0369a1; }
 
-        /* Динамик Камер Жагсаалт */
+        /* Динамик Камер Сонгох Хэсэг */
         .selector-card {
             background: #1e293b;
             border: 1px solid #334155;
@@ -52,7 +53,7 @@
         }
         .cam-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
             gap: 8px;
             margin-top: 10px;
         }
@@ -66,6 +67,7 @@
             font-weight: 600;
             font-size: 12px;
             transition: all 0.15s;
+            white-space: nowrap;
         }
         .cam-btn:hover { background: #334155; color: #fff; }
         .cam-btn.active {
@@ -75,12 +77,13 @@
             box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
         }
 
-        /* Видео дэлгэц */
+        /* Видео Дэлгэц */
         .video-wrapper {
             background: #1e293b;
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid #334155;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
         }
         .video-header {
             padding: 10px 16px;
@@ -97,16 +100,28 @@
             font-size: 11px;
             padding: 4px 10px;
             border-radius: 9999px;
+            letter-spacing: 0.5px;
         }
+        .expand-btn {
+            background: #334155;
+            color: #fff;
+            border: 1px solid #475569;
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .expand-btn:hover { background: #475569; }
         iframe {
             width: 100%;
-            height: 500px;
+            height: 520px;
             border: none;
             background: #000;
             display: block;
         }
 
-        /* Бичлэг үзэх хэсэг */
+        /* Бичлэг Үзэх (Playback) Хэсэг */
         .playback-card {
             background: #1e293b;
             border: 1px solid #334155;
@@ -134,6 +149,7 @@
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 13px;
         }
         .play-btn:hover { background: #15803d; }
 
@@ -163,6 +179,8 @@
             font-size: 13px;
             cursor: pointer;
         }
+        .ptz-btn:hover { background: #7dd3fc; }
+        .ptz-btn:active { background: #0284c7; }
         .zoom-group { display: flex; justify-content: center; gap: 12px; }
     </style>
 </head>
@@ -170,11 +188,11 @@
 
     <div class="container">
         <div class="header-bar">
-            <h2>Хяналтын Систем (Динамик Сүлжээ)</h2>
+            <h2>Хяналтын Систем (ISUP 5.0 Live & Playback)</h2>
             <button class="refresh-btn" onclick="fetchConnectedCameras()">🔄 Камеруудыг дахин скан хийх</button>
         </div>
 
-        <!-- Динамик Камер сонгох хэсэг -->
+        <!-- Динамик Камер Сонгох Хэсэг -->
         <div class="selector-card">
             <div style="text-align: left; font-size: 13px; color: #94a3b8; font-weight: bold;">
                 Одоогоор холбогдсон камерууд (<span id="camCount">0</span>):
@@ -184,16 +202,19 @@
             </div>
         </div>
 
-        <!-- Видео дэлгэц -->
-        <div class="video-wrapper">
+        <!-- Видео Дэлгэц -->
+        <div class="video-wrapper" id="playerWrapper">
             <div class="video-header">
                 <span id="currentCamTitle">Камер сонгогдоогүй</span>
-                <span class="badge" id="statusBadge">ХҮЛЭЭГДЭЖ БАЙНА</span>
+                <div>
+                    <span class="badge" id="statusBadge">ХҮЛЭЭГДЭЖ БАЙНА</span>
+                    <button class="expand-btn" onclick="toggleFullScreen('playerWrapper')">⛶ Бүтэн дэлгэц</button>
+                </div>
             </div>
             <iframe id="livePlayer" src="" allow="fullscreen; autoplay"></iframe>
         </div>
 
-        <!-- Бичлэг ухрааж үзэх (Playback) хэсэг -->
+        <!-- Бичлэг Ухрааж Үзэх Хэсэг -->
         <div class="playback-card">
             <span style="font-size: 13px; font-weight: bold; color: #94a3b8;">Бичлэг ухраах:</span>
             <input type="datetime-local" id="playbackTime" class="time-input">
@@ -201,7 +222,7 @@
             <button class="refresh-btn" style="background:#475569;" onclick="returnToLive()">Шууд дүрс рүү буцах</button>
         </div>
 
-        <!-- Идэвхтэй камерын PTZ удирдлага -->
+        <!-- PTZ Удирдлага -->
         <div class="ptz-card">
             <span style="font-size: 13px; color: #94a3b8;">PTZ Удирдлага</span>
             <div class="controls-grid">
@@ -223,14 +244,15 @@
     </div>
 
     <script>
-        // Идэвхтэй ажиллаж буй Cloudflare хаягуудаа тавина:
+        // Идэвхтэй ажиллаж буй Cloudflare хаягууд
         const API_HOST = "https://extra-pointing-regression-meet.trycloudflare.com";
         const STREAM_URL = "https://amounts-live-richardson-rather.trycloudflare.com/live";
 
         let activeDev = "";
         let activeCh = 1;
+        let activeTitle = "";
 
-        // 1. Серверээс яг одоо холбоотой байгаа камеруудыг татах
+        // 1. Онлайн камеруудыг серверээс татах
         function fetchConnectedCameras() {
             const grid = document.getElementById('camGrid');
             grid.innerHTML = "<div style='color: #64748b;'>Хайж байна...</div>";
@@ -265,10 +287,11 @@
                 });
         }
 
-        // 2. Сонгосон камерын шууд дүрсийг нээх
+        // 2. Шууд дүрс сэлгэх
         function selectCamera(dev, ch, title, btn) {
             activeDev = dev;
             activeCh = ch;
+            activeTitle = title;
 
             document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
@@ -279,19 +302,24 @@
 
             fetch(`${API_HOST}/switch?dev=${dev}&ch=${ch}`)
                 .then(r => r.json())
-                .then(d => {
+                .then(() => {
                     setTimeout(() => {
                         document.getElementById('livePlayer').src = `${STREAM_URL}?t=${Date.now()}`;
                         document.getElementById('statusBadge').innerText = "ШУУД ДҮРС";
                         document.getElementById('statusBadge').style.background = "#16a34a";
                     }, 2500);
+                })
+                .catch(e => {
+                    console.error("Сэлгэх алдаа:", e);
+                    document.getElementById('statusBadge').innerText = "АЛДАА";
+                    document.getElementById('statusBadge').style.background = "#dc2626";
                 });
         }
 
-        // 3. Бичлэг ухраах хүсэлт илгээх (Playback)
+        // 3. Бичлэг ухраах (Playback)
         function playRecord() {
-            const timeVal = document.getElementById('playbackTime').value;
-            if (!timeVal) {
+            const timeInput = document.getElementById('playbackTime');
+            if (!timeInput.value) {
                 alert("Ухрааж үзэх огноо, цагаа сонгоно уу!");
                 return;
             }
@@ -300,48 +328,68 @@
                 return;
             }
 
-            // ISO форматаас (YYYY-MM-DDTHH:MM) YYYYMMDDTHHMMSS болгох
-            const dateObj = new Date(timeVal);
-            const pad = (n) => n.toString().padStart(2, '0');
-            const startStr = `${dateObj.getFullYear()}${pad(dateObj.getMonth()+1)}${pad(dateObj.getDate())}T${pad(dateObj.getHours())}${pad(dateObj.getMinutes())}00`;
+            // UTC-ийн зөрүүг арилгаж, сонгосон бодит цагийг шууд илгээх: "2026-09-18T11:05" -> "20260918T110500"
+            const raw = timeInput.value.replace(/[-:]/g, '');
+            const startStr = raw + "00";
 
-            // Дуусах цагийг эхлэх цагаас 30 минутын дараагаар авах
-            const endDateObj = new Date(dateObj.getTime() + 30*60000);
-            const endStr = `${endDateObj.getFullYear()}${pad(endDateObj.getMonth()+1)}${pad(endDateObj.getDate())}T${pad(endDateObj.getHours())}${pad(endDateObj.getMinutes())}00`;
+            // 30 минутын дараах дуусах хугацааг тооцоолох
+            const d = new Date(timeInput.value);
+            d.setMinutes(d.getMinutes() + 30);
+            const pad = (n) => n.toString().padStart(2, '0');
+            const endStr = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
 
             document.getElementById('statusBadge').innerText = "БИЧЛЭГ ХАЙЖ БАЙНА...";
             document.getElementById('statusBadge').style.background = "#8b5cf6";
 
             fetch(`${API_HOST}/playback?dev=${activeDev}&ch=${activeCh}&start=${startStr}&end=${endStr}`)
                 .then(r => r.json())
-                .then(d => {
+                .then(() => {
                     setTimeout(() => {
                         document.getElementById('livePlayer').src = `${STREAM_URL}?t=${Date.now()}`;
-                        document.getElementById('currentCamTitle').innerText = `${activeDev} CH ${activeCh} (БИЧЛЭГ: ${timeVal})`;
+                        document.getElementById('currentCamTitle').innerText = `${activeTitle} (БИЧЛЭГ: ${timeInput.value.replace('T', ' ')})`;
                         document.getElementById('statusBadge').innerText = "БИЧЛЭГ ТОГЛОЖ БАЙНА";
                         document.getElementById('statusBadge').style.background = "#6366f1";
                     }, 3000);
+                })
+                .catch(e => {
+                    console.error("Бичлэг тоглуулах алдаа:", e);
+                    document.getElementById('statusBadge').innerText = "АЛДАА";
+                    document.getElementById('statusBadge').style.background = "#dc2626";
                 });
         }
 
+        // 4. Шууд дүрс рүү буцах
         function returnToLive() {
             if (activeDev) {
-                selectCamera(activeDev, activeCh, `${activeDev} CH ${activeCh}`, null);
+                selectCamera(activeDev, activeCh, activeTitle, null);
             }
         }
 
+        // 5. PTZ команд илгээх
         function sendPTZ(cmd) {
             if (!activeDev) return;
-            fetch(`${API_HOST}/ptz?dev=${activeDev}&ch=${activeCh}&cmd=${cmd}`);
+            fetch(`${API_HOST}/ptz?dev=${activeDev}&ch=${activeCh}&cmd=${cmd}`)
+                .catch(e => console.error("PTZ алдаа:", e));
         }
 
-        // Хуудас ачаалагдахад динамик жагсаалтыг дуудах
+        // 6. Бүтэн дэлгэцээр үзэх
+        function toggleFullScreen(elemId) {
+            const elem = document.getElementById(elemId);
+            if (!document.fullscreenElement) {
+                if (elem.requestFullscreen) elem.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        // Хуудас ачаалагдахад 15 минутын өмнөх локал цагийг оруулах
         window.onload = () => {
             fetchConnectedCameras();
-            // Одоогийн цагийг default огноонд тааруулах
             const now = new Date();
-            now.setMinutes(now.getMinutes() - 10);
-            document.getElementById('playbackTime').value = now.toISOString().slice(0,16);
+            now.setMinutes(now.getMinutes() - 15);
+            const pad = (n) => n.toString().padStart(2, '0');
+            const localTimeStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+            document.getElementById('playbackTime').value = localTimeStr;
         };
     </script>
 </body>
