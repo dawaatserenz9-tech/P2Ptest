@@ -244,11 +244,11 @@
     </div>
 
     <script>
-        // Cloudflare Tunnel хаягууд:
-        // 8891 порт -> Удирдлагын API сервер (эсвэл HLS):
-        const API_HOST = "https://earnings-infants-ver-actually.trycloudflare.com";
+        // Шинэчилсэн Cloudflare Tunnel хаягууд:
+        // 8891 порт -> Удирдлагын API сервер:
+        const API_HOST = "https://theory-hits-buzz-federation.trycloudflare.com";
         // 8890 порт -> MediaMTX WebRTC шууд урсгал:
-        const STREAM_URL = "https://robots-headset-fuji-roland.trycloudflare.com/live";
+        const STREAM_URL = "https://optimum-endless-annex-hint.trycloudflare.com/live";
 
         let activeDev = "";
         let activeCh = 1;
@@ -277,7 +277,6 @@
                         btn.onclick = () => selectCamera(cam.devId, cam.channel, `${cam.name} CH ${cam.channel}`, btn);
                         grid.appendChild(btn);
 
-                        // Эхний камерыг автоматаар сонгох
                         if (index === 0 && !activeDev) {
                             selectCamera(cam.devId, cam.channel, `${cam.name} CH ${cam.channel}`, btn);
                         }
@@ -382,7 +381,6 @@
             }
         }
 
-        // Анх ачаалагдах үед
         window.onload = () => {
             fetchConnectedCameras();
             const now = new Date();
