@@ -244,9 +244,11 @@
     </div>
 
     <script>
-        // Идэвхтэй ажиллаж буй Cloudflare хаягууд
-        const API_HOST = "https://extra-pointing-regression-meet.trycloudflare.com";
-        const STREAM_URL = "https://amounts-live-richardson-rather.trycloudflare.com/live";
+        // Cloudflare Tunnel хаягууд:
+        // 8891 порт -> Удирдлагын API сервер (эсвэл HLS):
+        const API_HOST = "https://earnings-infants-ver-actually.trycloudflare.com";
+        // 8890 порт -> MediaMTX WebRTC шууд урсгал:
+        const STREAM_URL = "https://robots-headset-fuji-roland.trycloudflare.com/live";
 
         let activeDev = "";
         let activeCh = 1;
@@ -275,7 +277,7 @@
                         btn.onclick = () => selectCamera(cam.devId, cam.channel, `${cam.name} CH ${cam.channel}`, btn);
                         grid.appendChild(btn);
 
-                        // Эхний камерыг анхдагчаар нээх
+                        // Эхний камерыг автоматаар сонгох
                         if (index === 0 && !activeDev) {
                             selectCamera(cam.devId, cam.channel, `${cam.name} CH ${cam.channel}`, btn);
                         }
@@ -328,11 +330,9 @@
                 return;
             }
 
-            // UTC-ийн зөрүүг арилгаж, сонгосон бодит цагийг шууд илгээх: "2026-09-18T11:05" -> "20260918T110500"
             const raw = timeInput.value.replace(/[-:]/g, '');
             const startStr = raw + "00";
 
-            // 30 минутын дараах дуусах хугацааг тооцоолох
             const d = new Date(timeInput.value);
             d.setMinutes(d.getMinutes() + 30);
             const pad = (n) => n.toString().padStart(2, '0');
@@ -382,7 +382,7 @@
             }
         }
 
-        // Хуудас ачаалагдахад 15 минутын өмнөх локал цагийг оруулах
+        // Анх ачаалагдах үед
         window.onload = () => {
             fetchConnectedCameras();
             const now = new Date();
