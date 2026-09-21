@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCTV Monitor (Static Public IP)</title>
+    <title>CCTV Monitor (Auto Network Routing)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #0b0f19; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 16px; text-align: center; }
@@ -34,7 +34,7 @@
 <body>
     <div class="container">
         <div class="header-bar">
-            <h2>Хяналтын Систем (Public IP: 202.131.225.19)</h2>
+            <h2>Хяналтын Систем (<span id="netStatus" style="color:#38bdf8;">Сүлжээ шалгаж байна...</span>)</h2>
             <button class="refresh-btn" onclick="fetchConnectedCameras()">🔄 Камеруудыг дахин скан хийх</button>
         </div>
 
@@ -86,13 +86,38 @@
     </div>
 
     <script>
-        // БАЙНГЫН СТАТИК IP ХАЯГУУД (ХЭЗЭЭ Ч ӨӨРЧЛӨГДӨХГҮЙ)
-        const API_HOST = "http://202.131.225.19:8891";
-        const STREAM_URL = "http://202.131.225.19:8890/live";
+        const WAN_IP = "202.131.225.19";
+        const LAN_IP = "192.168.88.21";
+        
+        let ACTIVE_IP = WAN_IP;
+        let API_HOST = `http://${ACTIVE_IP}:8891`;
+        let STREAM_URL = `http://${ACTIVE_IP}:8890/live`;
 
         let activeDev = "";
         let activeCh = 1;
         let activeTitle = "";
+
+        // Сүлжээг шалгаж LAN эсвэл WAN-г автоматаар сонгох функц
+        async function detectWorkingHost() {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 1200);
+
+            try {
+                // Эхлээд LAN IP-рүү туршиж үзнэ
+                await fetch(`http://${LAN_IP}:8891/cameras`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                ACTIVE_IP = LAN_IP;
+                document.getElementById('netStatus').innerText = `Дотоод LAN (${LAN_IP})`;
+            } catch (e) {
+                // Амжилтгүй бол WAN IP-г ашиглана
+                ACTIVE_IP = WAN_IP;
+                document.getElementById('netStatus').innerText = `Гадаад WAN (${WAN_IP})`;
+            }
+
+            API_HOST = `http://${ACTIVE_IP}:8891`;
+            STREAM_URL = `http://${ACTIVE_IP}:8890/live`;
+            fetchConnectedCameras();
+        }
 
         function fetchConnectedCameras() {
             const grid = document.getElementById('camGrid');
@@ -122,7 +147,7 @@
                     });
                 })
                 .catch(err => {
-                    grid.innerHTML = "<div style='color: #ef4444;'>Сервертэй холбогдож чадсангүй. Port 8891 нээлттэй эсэхийг шалгана уу.</div>";
+                    grid.innerHTML = "<div style='color: #ef4444;'>Сервертэй холбогдож чадсангүй.</div>";
                 });
         }
 
@@ -199,7 +224,7 @@
         }
 
         window.onload = () => {
-            fetchConnectedCameras();
+            detectWorkingHost();
             const now = new Date();
             now.setMinutes(now.getMinutes() - 15);
             const pad = (n) => n.toString().padStart(2, '0');
